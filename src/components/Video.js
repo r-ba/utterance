@@ -1,22 +1,54 @@
 import React from 'react';
 
-function Video(props) {
-  if (!props.id) {
-    return null;
+class Video extends React.PureComponent {
+  componentDidUpdate() {
+    if (!window.YT) {
+      this.spawnYT();
+    } else {
+      this.player.loadVideoById({'videoId': this.props.id,
+                 'startSeconds': 5,
+                 'endSeconds': 60,
+                 'suggestedQuality': 'large'});
+    }
   }
-  const url = `https://www.youtube.com/embed/${props.id}`;
-  return (
-    <div className="VideoPlayer">
-      <iframe
-        title="YouTube video"
-        width="560"
-        height="315"
-        src={url}
-        frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-        allowFullscreen>
-      </iframe>
-    </div>
-  );
+
+  spawnYT = () => {
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+
+    window.onYouTubeIframeAPIReady = this.loadVideo;
+
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  }
+
+  loadVideo = () => {
+    const id = this.props.id;
+
+    this.player = new window.YT.Player(`youtube-player-${id}`, {
+      videoId: id,
+      events: {
+        onReady: this.onPlayerReady,
+      }
+    });
+  };
+
+  onPlayerReady = event => {
+    event.target.playVideo();
+  };
+
+  render() {
+    const id = this.props.id;
+
+    if (!id) return null;
+
+    return (
+      <div className="yt-container">
+        <div id={`youtube-player-${id}`} className="yt-embed" />
+      </div>
+    );
+  }
+
 }
 
 export default Video;

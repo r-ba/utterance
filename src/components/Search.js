@@ -1,13 +1,11 @@
 import React from 'react';
 import { TextInput, Button, Box } from 'grommet';
+import { Search } from 'grommet-icons';
 
-function Search(props) {
+function SearchBar(props) {
   return (
     <div>
-      <Box
-        direction="row"
-        pad="small"
-      >
+      <Box direction="row" pad="small">
         <Box pad="small">
           <TextInput
             placeholder="Query"
@@ -24,13 +22,14 @@ function Search(props) {
             }}
           />
         </Box>
+        <Box pad="small">
+          <Button onClick={() => props.onSubmit()}>
+            <Search className="search-button" />
+          </Button>
+        </Box>
       </Box>
-      <Button
-        label="Search"
-        onClick={() => props.onSubmit()}
-      />
     </div>
   );
 }
 
-export default Search;
+export default SearchBar;

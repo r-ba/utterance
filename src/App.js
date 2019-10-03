@@ -27,6 +27,9 @@ class App extends React.Component {
 
   handleSubmit() {
     console.log(this.state.searchQuery, this.state.phraseQuery);
+    this.setState({
+      videoId: this.state.searchQuery
+    });
   }
 
   render() {

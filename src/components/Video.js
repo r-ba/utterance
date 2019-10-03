@@ -1,6 +1,6 @@
 import React from 'react';
 
-function VideoElement(props) {
+function Video(props) {
   if (!props.id) {
     return null;
   }
@@ -19,4 +19,4 @@ function VideoElement(props) {
   );
 }
 
-export default VideoElement;
+export default Video;

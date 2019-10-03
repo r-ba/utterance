@@ -1,24 +1,44 @@
 import React from 'react';
 import './styles/App.css';
-import Video from './components/VideoEl';
+import Video from './components/Video';
+import Search from './components/Search';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      videoId: null
+      videoId: null,
+      searchQuery: null,
+      phraseQuery: null
     }
+  }
+
+  handleChange(field, string) {
+    if (field === "searchQuery") {
+      this.setState({
+        searchQuery: string
+      });
+    } else {
+      this.setState({
+        phraseQuery: string
+      });
+    }
+  }
+
+  handleSubmit() {
+    console.log(this.state.searchQuery, this.state.phraseQuery);
   }
 
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          People utter words
-          <Video
-            id={this.state.videoId}
-          />
-        </header>
+        <Search
+          onChange={(f,s)=>this.handleChange(f,s)}
+          onSubmit={()=>this.handleSubmit()}
+        />
+        <Video
+          id={this.state.videoId}
+        />
       </div>
     );
   }

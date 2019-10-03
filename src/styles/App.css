@@ -2,12 +2,8 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-}
-
 .App-header {
-  background-color: #282c34;
+  background-color: #2c2c54;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -19,4 +15,8 @@
 
 .App-link {
   color: #09d3ac;
+}
+
+.VideoPlayer {
+
 }

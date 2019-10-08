@@ -5,12 +5,16 @@ import { Search } from 'grommet-icons';
 function SearchBar(props) {
   return (
     <div>
-      <Box direction="row" pad="small">
+      <Box
+        className="search-bar"
+        direction="row"
+        pad="small"
+      >
         <Box pad="small">
           <TextInput
             placeholder="Query"
             onChange={event=> {
-              props.onChange("searchQuery", event.target.value);
+              props.onChange("search", event.target.value);
             }}
           />
         </Box>
@@ -18,7 +22,7 @@ function SearchBar(props) {
           <TextInput
             placeholder="Phrase"
             onChange={event=> {
-              props.onChange("phraseQuery", event.target.value);
+              props.onChange("phrase", event.target.value);
             }}
           />
         </Box>

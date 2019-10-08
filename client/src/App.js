@@ -1,34 +1,44 @@
 import React from 'react';
-import './styles/App.css';
-import Video from './components/Video';
 import Search from './components/Search';
+import Video from './components/Video';
+import VideoList from './components/VideoList';
+import './styles/App.css';
+import data from './defaultData.js';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      videoId: null,
-      searchQuery: null,
-      phraseQuery: null
+      query: null,
+      phrase: null,
+      currentVideoId: 0,
+      videoList: data.items,
+      pageToken: data.token
     }
   }
 
-  handleChange(field, string) {
-    if (field === "searchQuery") {
-      this.setState({
-        searchQuery: string
-      });
-    } else {
-      this.setState({
-        phraseQuery: string
-      });
-    }
+  handleSearchBarChange(field, string) {
+    this.setState({[field]: string});
   }
 
   handleSubmit() {
-    console.log(this.state.searchQuery, this.state.phraseQuery);
+    if (this.state.search) {
+      let url = `https://utterance-api.herokuapp.com/api/${this.state.search}/`;
+      if (this.state.phrase) url += this.state.phrase;
+      fetch(url).then(results => {
+        return results.json();
+      }).then(data => {
+        this.setState({
+          videoList: data.items,
+          pageToken: data.token
+        });
+      });
+    }
+  }
+
+  selectVideo(id) {
     this.setState({
-      videoId: this.state.searchQuery
+      currentVideoId: id
     });
   }
 
@@ -36,11 +46,15 @@ class App extends React.Component {
     return (
       <div className="App">
         <Search
-          onChange={(f,s)=>this.handleChange(f,s)}
-          onSubmit={()=>this.handleSubmit()}
+          onChange={(field, string) => this.handleSearchBarChange(field, string)}
+          onSubmit={() => this.handleSubmit()}
         />
         <Video
-          id={this.state.videoId}
+          item={this.state.videoList[this.state.currentVideoId]}
+        />
+        <VideoList
+          selectVideo={(id) => this.selectVideo(id)}
+          videos={this.state.videoList}
         />
       </div>
     );

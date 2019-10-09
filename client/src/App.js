@@ -17,11 +17,19 @@ class App extends React.Component {
     }
   }
 
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyPress);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyPress);
+  }
+
   handleSearchBarChange(field, string) {
     this.setState({[field]: string});
   }
 
-  handleSubmit() {
+  handleSubmit = () => {
     if (this.state.search) {
       let url = `https://utterance-api.herokuapp.com/api/${this.state.search}/`;
       if (this.state.phrase) url += this.state.phrase;
@@ -33,6 +41,12 @@ class App extends React.Component {
           pageToken: data.token
         });
       });
+    }
+  }
+
+  handleKeyPress = (e) => {
+    if (e.keyCode === 13) {
+      this.handleSubmit();
     }
   }
 

@@ -17,17 +17,22 @@ class Video extends React.PureComponent {
       const firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     } else {
-      const startSeconds = this.props.item.matches.length ? this.props.item.matches[0].start : 0;
-      this.player.loadVideoById({
-        'videoId': this.props.item.id,
-        'startSeconds': startSeconds,
-        'suggestedQuality': 'large'
-       });
+      if (this.player.id === this.props.item.id) {
+        this.player.seekTo(parseFloat(this.props.item.matches[this.props.time].start));
+      } else {
+        const startSeconds = this.props.item.matches.length ? this.props.item.matches[this.props.time].start : 0;
+        this.player.loadVideoById({
+          'videoId': this.props.item.id,
+          'startSeconds': startSeconds,
+          'suggestedQuality': 'large'
+        });
+        this.player.id = this.props.item.id;
+      }
     }
   }
 
   loadVideo = () => {
-    const startSeconds = this.props.item.matches.length ? this.props.item.matches[0].start : 0;
+    const startSeconds = this.props.item.matches.length ? this.props.item.matches[this.props.time].start : 0;
     const id = this.props.item.id;
     this.player = new window.YT.Player(`youtube-player-${id}`, {
       videoId: id,
@@ -36,6 +41,7 @@ class Video extends React.PureComponent {
         onReady: event => event.target.playVideo()
       }
     });
+    this.player.id = this.props.item.id;
   };
 
   onPlayerReady = event => {

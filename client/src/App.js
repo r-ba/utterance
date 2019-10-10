@@ -23,7 +23,8 @@ class App extends React.Component {
       prevColour: "#ddd",
       nextColour: "#999",
       cycleMax: 3,
-      cycleIndex: 0
+      cycleIndex: 0,
+      allowSearches: true
     }
   }
 
@@ -47,6 +48,7 @@ class App extends React.Component {
 
   handleSubmit = () => {
     if (this.state.search) {
+      this.setState({ allowSearches: false });
       let url = `https://utterance-api.herokuapp.com/api/${this.state.search}/`;
       if (this.state.phrase) url += this.state.phrase;
       fetch(url).then(results => {
@@ -66,7 +68,8 @@ class App extends React.Component {
           prevDisabled: true,
           prevColour: "#ddd",
           cycleMax: cycleMax-1,
-          cycleIndex: 0
+          cycleIndex: 0,
+          allowSearches: true
         });
         if (cycleMax === 1) this.toggleButton("next", "disable");
         else this.toggleButton("next", "enable");
@@ -168,6 +171,7 @@ class App extends React.Component {
         <Search
           onChange={(field, string) => this.handleSearchBarChange(field, string)}
           onSubmit={() => this.handleSubmit()}
+          allow={this.state.allowSearches}
         />
         <Box direction="row">
           <Button

@@ -1,8 +1,10 @@
 import React from 'react';
 import { TextInput, Button, Box } from 'grommet';
 import { Search } from 'grommet-icons';
+import { BounceLoader } from 'react-spinners';
 
 function SearchBar(props) {
+  const buttonMargin = props.allow ? "search-button" : "search-loading";
   return (
     <div>
       <Box
@@ -27,8 +29,8 @@ function SearchBar(props) {
           />
         </Box>
         <Box pad="small">
-          <Button onClick={() => props.onSubmit()}>
-            <Search className="search-button" />
+          <Button className={buttonMargin} disabled={!props.allow} onClick={() => props.onSubmit()}>
+            {props.allow ? <Search /> : <BounceLoader size={25} />}
           </Button>
         </Box>
       </Box>

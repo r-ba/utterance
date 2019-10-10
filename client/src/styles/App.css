@@ -36,3 +36,7 @@
   cursor: pointer;
   padding-right: 10px;
 }
+
+.thumbnail-active {
+  border: 5px solid #999;
+}

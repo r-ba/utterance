@@ -11,6 +11,8 @@ function VideoList(props) {
         onVideoSelect={props.selectVideo}
         video={props.videos[i]}
         i={i}
+        current={props.currentVideo}
+        prev={props.prevVideo}
       />
     );
   });

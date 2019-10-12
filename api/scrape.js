@@ -17,12 +17,12 @@ const reduceItems = (items) => {
   return result;
 };
 
-const searchYouTube = async (q, token) => {
+const searchYouTube = async (token, query) => {
   const results = await youtube.search.list({
     'part': 'snippet',
     'type': 'video',
     'maxResults': '10',
-    'q': q,
+    'q': query,
     'pageToken': token
   });
   return {
@@ -31,10 +31,10 @@ const searchYouTube = async (q, token) => {
   };
 };
 
-const searchCaptions = async (q) => {
+const searchCaptions = async (token, query, phrase) => {
   let resultCount = 0;
   let results = {};
-  let videos = await searchYouTube(q.query);
+  let videos = await searchYouTube(token, query);
   let pageToken = videos.token;
   while (pageToken && resultCount == 0) {
     for (let i in videos.items) {
@@ -43,7 +43,7 @@ const searchCaptions = async (q) => {
         let subs = await getSubtitles({ videoID: id });
         let matches = [];
         for (let caption of subs) {
-          if (caption.text.includes(q.phrase)) matches.push(caption);
+          if (caption.text.toLowerCase().includes(phrase)) matches.push(caption);
         };
         if (matches.length) {
           results[resultCount++] = {
@@ -56,7 +56,7 @@ const searchCaptions = async (q) => {
       } catch (err) {}; // ignore items without captions
     };
     if (!resultCount) {
-      videos = await searchYouTube(q.query, pageToken);
+      videos = await searchYouTube(query, pageToken);
       pageToken = videos.token;
     };
   };
@@ -66,5 +66,7 @@ const searchCaptions = async (q) => {
   };
 };
 
-exports.searchYouTube = searchYouTube;
-exports.searchCaptions = searchCaptions;
+module.exports = {
+  searchYouTube: searchYouTube,
+  searchCaptions: searchCaptions
+};

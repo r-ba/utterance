@@ -15,6 +15,7 @@ function SearchBar(props) {
         <Box pad="small">
           <TextInput
             placeholder="Query"
+            value="joe rogan"
             onChange={event=> {
               props.onChange("search", event.target.value);
             }}
@@ -23,6 +24,7 @@ function SearchBar(props) {
         <Box pad="small">
           <TextInput
             placeholder="Phrase"
+            value="possible"
             onChange={event=> {
               props.onChange("phrase", event.target.value);
             }}

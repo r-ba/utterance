@@ -11,8 +11,10 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      query: null,
-      phrase: null,
+      search: "joe rogan",
+      prevSearch: null,
+      phrase: "possible",
+      prevPhrase: null,
       prevVideoId: 0,
       currentVideoId: 0,
       currentVideoTime: 0,
@@ -47,7 +49,9 @@ class App extends React.Component {
   }
 
   handleSubmit = () => {
-    if (this.state.search) {
+    let isNewSearch = (this.state.search !== this.state.prevSearch);
+    isNewSearch = (isNewSearch || (this.state.phrase !== this.state.prevPhrase));
+    if (this.state.search &&  isNewSearch) {
       this.setState({ allowSearches: false });
       let url = `https://utterance-api.herokuapp.com/api/${this.state.search}/`;
       if (this.state.phrase) url += this.state.phrase;
@@ -59,7 +63,11 @@ class App extends React.Component {
           let matchLength = data.items[i].matches.length;
           cycleMax += matchLength ? matchLength : 1;
         };
+        const prevSearch = this.state.search;
+        const prevPhrase = this.state.phrase;
         this.setState({
+          prevSearch: prevSearch,
+          prevPhrase: prevPhrase,
           prevVideoId: 0,
           currentVideoId: 0,
           currentVideoTime: 0,

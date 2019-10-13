@@ -56,7 +56,7 @@ const searchCaptions = async (token, query, phrase) => {
       } catch (err) {}; // ignore items without captions
     };
     if (!resultCount) {
-      videos = await searchYouTube(query, pageToken);
+      videos = await searchYouTube(pageToken, query);
       pageToken = videos.token;
     };
   };

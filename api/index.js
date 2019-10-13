@@ -24,10 +24,10 @@ MongoClient.connect(DB_URL, dbOpts, function (err, client) {
   cache = db.collection('cache');
 });
 
-const search = async (token, query, phrase) => {
-  cache.findOne({ prevToken: token, query: query, phrase: phrase }, async (err, obj) => {
+const search = async (res, token, query, phrase) => {
+  await cache.findOne({ prevToken: token, query: query, phrase: phrase }, async (err, obj) => {
     if (err) {
-      return { err: err };
+      res.json({ err: err });
     } else {
       if (obj == null) {
         const t = (token === "new") ? undefined : token;
@@ -43,23 +43,24 @@ const search = async (token, query, phrase) => {
           phrase: phrase,
           ...searchResult
         }, { safe: true });
-        return searchResult;
+        res.json({err: false, ...searchResult});
       } else {
-        return {
+        res.json({
+          err: false,
           items: obj.items,
           token: obj.token
-        };
+        });
       };
     };
   });
 };
 
 app.get('/api/:token/:query', async function(req, res) {
-  res.json(await search(req.params.token, req.params.query, ""));
+  await search(res, req.params.token, req.params.query, "");
 });
 
 app.get('/api/:token/:query/:phrase', async function(req, res) {
-  res.json(await search(req.params.token, req.params.query, req.params.phrase));
+  await search(res, req.params.token, req.params.query, req.params.phrase)
 });
 
 const port = app.get('port');

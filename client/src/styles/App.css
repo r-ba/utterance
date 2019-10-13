@@ -44,6 +44,10 @@
   padding-right: 10px;
 }
 
+.more-button {
+  margin-top: 10px;
+}
+
 .thumbnail-active {
   border: 5px solid #999;
 }

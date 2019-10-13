@@ -3,7 +3,7 @@ import Search from './components/Search';
 import Video from './components/Video';
 import VideoList from './components/VideoList';
 import { Button, Box } from 'grommet';
-import { CaretNext, CaretPrevious } from 'grommet-icons';
+import { Add, CaretNext, CaretPrevious } from 'grommet-icons';
 import './styles/App.css';
 import data from './defaultData.js';
 
@@ -12,19 +12,20 @@ class App extends React.Component {
     super(props);
     this.state = {
       search: "joe rogan",
-      prevSearch: null,
+      prevSearch: "joe rogan",
       phrase: "possible",
-      prevPhrase: null,
+      prevPhrase: "possible",
       prevVideoId: 0,
       currentVideoId: 0,
       currentVideoTime: 0,
       videoList: data.items,
+      videoIds: data.ids,
       pageToken: data.token,
       prevDisabled: true,
       nextDisabled: false,
       prevColour: "#ddd",
       nextColour: "#999",
-      cycleMax: 3,
+      cycleMax: 26,
       cycleIndex: 0,
       allowSearches: true
     }
@@ -48,41 +49,76 @@ class App extends React.Component {
     this.setState({[field]: string, prevVideoId: this.state.currentVideoId });
   }
 
-  handleSubmit = () => {
+  fetchData = async (token, search, phrase) => {
+    let url = `https://utterance-api.herokuapp.com/api/${token}/${search}/${phrase}`;
+    return fetch(url).then(results => {
+      return results.json();
+    });
+  }
+
+  handleSubmit = async () => {
     let isNewSearch = (this.state.search !== this.state.prevSearch);
     isNewSearch = (isNewSearch || (this.state.phrase !== this.state.prevPhrase));
     if (this.state.search &&  isNewSearch) {
       this.setState({ allowSearches: false });
-      let url = `https://utterance-api.herokuapp.com/api/${this.state.search}/`;
-      if (this.state.phrase) url += this.state.phrase;
-      fetch(url).then(results => {
-        return results.json();
-      }).then(data => {
-        let cycleMax = 0;
-        for (let i in data.items) {
-          let matchLength = data.items[i].matches.length;
-          cycleMax += matchLength ? matchLength : 1;
-        };
-        const prevSearch = this.state.search;
-        const prevPhrase = this.state.phrase;
-        this.setState({
-          prevSearch: prevSearch,
-          prevPhrase: prevPhrase,
-          prevVideoId: 0,
-          currentVideoId: 0,
-          currentVideoTime: 0,
-          videoList: data.items,
-          pageToken: data.token,
-          prevDisabled: true,
-          prevColour: "#ddd",
-          cycleMax: cycleMax-1,
-          cycleIndex: 0,
-          allowSearches: true
-        });
-        if (cycleMax === 1) this.toggleButton("next", "disable");
-        else this.toggleButton("next", "enable");
+      const data = await this.fetchData("new", this.state.search, this.state.phrase);
+      let ids = [];
+      let cycleMax = 0;
+      for (let i in data.items) {
+        ids.push(data.items[i].id);
+        let matchLength = data.items[i].matches.length;
+        cycleMax += matchLength ? matchLength : 1;
+      };
+      const prevSearch = this.state.search;
+      const prevPhrase = this.state.phrase;
+      this.setState({
+        prevSearch: prevSearch,
+        prevPhrase: prevPhrase,
+        prevVideoId: 0,
+        currentVideoId: 0,
+        currentVideoTime: 0,
+        videoList: data.items,
+        videoIds: data.ids,
+        pageToken: data.token,
+        prevDisabled: true,
+        prevColour: "#ddd",
+        cycleMax: cycleMax-1,
+        cycleIndex: 0,
+        allowSearches: true
       });
+      if (cycleMax === 1) this.toggleButton("next", "disable");
+      else this.toggleButton("next", "enable");
     }
+  }
+
+  handleMore = async () => {
+    this.setState({ allowSearches: false });
+    let cycleMax = this.state.cycleMax;
+    let videoList = this.state.videoList;
+    let numVideos = Object.keys(videoList).length;
+    const token = this.state.pageToken;
+    const search = this.state.prevSearch;
+    const phrase = this.state.prevPhrase;
+    const data = await this.fetchData(token, search, phrase);
+    let ids = this.state.videoIds;
+    for (let i in data.items) {
+      let id = data.items[i].id;
+      if (!ids.includes(id)) {
+        let matchLength = data.items[i].matches.length;
+        cycleMax += matchLength ? matchLength : 1;
+        videoList[numVideos++] = data.items[i];
+        ids.push(id);
+      };
+    };
+    this.setState({
+      videoList: videoList,
+      videoIds: ids,
+      pageToken: data.token,
+      cycleMax: cycleMax-1,
+      allowSearches: true,
+      nextColour: "#999",
+      nextDisabled: false
+    });
   }
 
   handleCycle(dir) {
@@ -180,6 +216,8 @@ class App extends React.Component {
           onChange={(field, string) => this.handleSearchBarChange(field, string)}
           onSubmit={() => this.handleSubmit()}
           allow={this.state.allowSearches}
+          query={this.state.search}
+          phrase={this.state.phrase}
         />
         <Box direction="row">
           <Button
@@ -213,6 +251,16 @@ class App extends React.Component {
           selectVideo={(id) => this.selectVideo(id)}
           videos={this.state.videoList}
         />
+        {
+          this.state.pageToken ?
+            <Button
+              className="more-button"
+              icon={<Add />}
+              label="Load More"
+              onClick={()=>this.handleMore()}
+            />
+          : null
+        }
       </div>
     );
   }

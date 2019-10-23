@@ -2,6 +2,7 @@ import React from 'react';
 import Search from './components/Search';
 import Video from './components/Video';
 import VideoList from './components/VideoList';
+import ReactModal from 'react-modal';
 import { Button, Box } from 'grommet';
 import { Add, CaretNext, CaretPrevious } from 'grommet-icons';
 import './styles/App.css';
@@ -27,8 +28,10 @@ class App extends React.Component {
       nextColour: "#999",
       cycleMax: 26,
       cycleIndex: 0,
-      allowSearches: true
+      allowSearches: true,
+      errModalVisible: false
     }
+    this.handleModalToggle = this.handleModalToggle.bind(this);
   }
 
   componentDidMount() {
@@ -37,6 +40,10 @@ class App extends React.Component {
 
   componentWillUnmount() {
     document.removeEventListener('keydown', this.handleKeyPress);
+  }
+
+  handleModalToggle (value) {
+    this.setState({ errModalVisible: value });
   }
 
   handleKeyPress = (e) => {
@@ -51,9 +58,14 @@ class App extends React.Component {
 
   fetchData = async (token, search, phrase) => {
     let url = `https://utterance-api.herokuapp.com/api/${token}/${search}/${phrase}`;
-    return fetch(url).then(results => {
-      return results.json();
-    });
+    try {
+      return fetch(url).then(results => {
+        return results.json();
+      });
+    } catch (err) {
+      this.handleModalToggle(true);
+      return {};
+    };
   }
 
   handleSubmit = async () => {
@@ -62,32 +74,34 @@ class App extends React.Component {
     if (this.state.search &&  isNewSearch) {
       this.setState({ allowSearches: false });
       const data = await this.fetchData("new", this.state.search, this.state.phrase);
-      let ids = [];
-      let cycleMax = 0;
-      for (let i in data.items) {
-        ids.push(data.items[i].id);
-        let matchLength = data.items[i].matches.length;
-        cycleMax += matchLength ? matchLength : 1;
-      };
-      const prevSearch = this.state.search;
-      const prevPhrase = this.state.phrase;
-      this.setState({
-        prevSearch: prevSearch,
-        prevPhrase: prevPhrase,
-        prevVideoId: 0,
-        currentVideoId: 0,
-        currentVideoTime: 0,
-        videoList: data.items,
-        videoIds: data.ids,
-        pageToken: data.token,
-        prevDisabled: true,
-        prevColour: "#ddd",
-        cycleMax: cycleMax-1,
-        cycleIndex: 0,
-        allowSearches: true
-      });
-      if (cycleMax === 1) this.toggleButton("next", "disable");
-      else this.toggleButton("next", "enable");
+      if (data) {
+        let ids = [];
+        let cycleMax = 0;
+        for (let i in data.items) {
+          ids.push(data.items[i].id);
+          let matchLength = data.items[i].matches.length;
+          cycleMax += matchLength ? matchLength : 1;
+        };
+        const prevSearch = this.state.search;
+        const prevPhrase = this.state.phrase;
+        this.setState({
+          prevSearch: prevSearch,
+          prevPhrase: prevPhrase,
+          prevVideoId: 0,
+          currentVideoId: 0,
+          currentVideoTime: 0,
+          videoList: data.items,
+          videoIds: data.ids,
+          pageToken: data.token,
+          prevDisabled: true,
+          prevColour: "#ddd",
+          cycleMax: cycleMax-1,
+          cycleIndex: 0,
+          allowSearches: true
+        });
+        if (cycleMax === 1) this.toggleButton("next", "disable");
+        else this.toggleButton("next", "enable");
+      }
     }
   }
 
@@ -100,25 +114,27 @@ class App extends React.Component {
     const search = this.state.prevSearch;
     const phrase = this.state.prevPhrase;
     const data = await this.fetchData(token, search, phrase);
-    let ids = this.state.videoIds;
-    for (let i in data.items) {
-      let id = data.items[i].id;
-      if (!ids.includes(id)) {
-        let matchLength = data.items[i].matches.length;
-        cycleMax += matchLength ? matchLength : 1;
-        videoList[numVideos++] = data.items[i];
-        ids.push(id);
+    if (data) {
+      let ids = this.state.videoIds;
+      for (let i in data.items) {
+        let id = data.items[i].id;
+        if (!ids.includes(id)) {
+          let matchLength = data.items[i].matches.length;
+          cycleMax += matchLength ? matchLength : 1;
+          videoList[numVideos++] = data.items[i];
+          ids.push(id);
+        };
       };
-    };
-    this.setState({
-      videoList: videoList,
-      videoIds: ids,
-      pageToken: data.token,
-      cycleMax: cycleMax-1,
-      allowSearches: true,
-      nextColour: "#999",
-      nextDisabled: false
-    });
+      this.setState({
+        videoList: videoList,
+        videoIds: ids,
+        pageToken: data.token,
+        cycleMax: cycleMax-1,
+        allowSearches: true,
+        nextColour: "#999",
+        nextDisabled: false
+      });
+    }
   }
 
   handleCycle(dir) {
@@ -263,6 +279,16 @@ class App extends React.Component {
             />
           : null
         }
+        <ReactModal
+           isOpen={this.state.errModalVisible}
+           contentLabel="An error"
+        >
+          An error has occurred, please try again later.
+          <Button
+            label="Close"
+            onClick={()=>this.handleModalToggle(false)}
+          />
+        </ReactModal>
       </div>
     );
   }

@@ -11,6 +11,7 @@ import data from './defaultData.js';
 class App extends React.Component {
   constructor(props) {
     super(props);
+    console.log(data);
     this.state = {
       search: "magnus carlsen",
       prevSearch: "magnus carlsen",
@@ -75,32 +76,36 @@ class App extends React.Component {
       this.setState({ allowSearches: false });
       const data = await this.fetchData("new", this.state.search, this.state.phrase);
       if (data) {
-        let ids = [];
-        let cycleMax = 0;
-        for (let i in data.items) {
-          ids.push(data.items[i].id);
-          let matchLength = data.items[i].matches.length;
-          cycleMax += matchLength ? matchLength : 1;
-        };
-        const prevSearch = this.state.search;
-        const prevPhrase = this.state.phrase;
-        this.setState({
-          prevSearch: prevSearch,
-          prevPhrase: prevPhrase,
-          prevVideoId: 0,
-          currentVideoId: 0,
-          currentVideoTime: 0,
-          videoList: data.items,
-          videoIds: data.ids,
-          pageToken: data.token,
-          prevDisabled: true,
-          prevColour: "#ddd",
-          cycleMax: cycleMax-1,
-          cycleIndex: 0,
-          allowSearches: true
-        });
-        if (cycleMax === 1) this.toggleButton("next", "disable");
-        else this.toggleButton("next", "enable");
+        if (!data.err) {
+          let ids = [];
+          let cycleMax = 0;
+          for (let i in data.items) {
+            ids.push(data.items[i].id);
+            let matchLength = data.items[i].matches.length;
+            cycleMax += matchLength ? matchLength : 1;
+          };
+          const prevSearch = this.state.search;
+          const prevPhrase = this.state.phrase;
+          this.setState({
+            prevSearch: prevSearch,
+            prevPhrase: prevPhrase,
+            prevVideoId: 0,
+            currentVideoId: 0,
+            currentVideoTime: 0,
+            videoList: data.items,
+            videoIds: ids,
+            pageToken: data.token,
+            prevDisabled: true,
+            prevColour: "#ddd",
+            cycleMax: cycleMax-1,
+            cycleIndex: 0,
+            allowSearches: true
+          });
+          if (cycleMax === 1) this.toggleButton("next", "disable");
+          else this.toggleButton("next", "enable");
+        } else {
+          this.handleModalToggle(true);
+        }
       }
     }
   }
@@ -115,25 +120,29 @@ class App extends React.Component {
     const phrase = this.state.prevPhrase;
     const data = await this.fetchData(token, search, phrase);
     if (data) {
-      let ids = this.state.videoIds;
-      for (let i in data.items) {
-        let id = data.items[i].id;
-        if (!ids.includes(id)) {
-          let matchLength = data.items[i].matches.length;
-          cycleMax += matchLength ? matchLength : 1;
-          videoList[numVideos++] = data.items[i];
-          ids.push(id);
+      if (!data.err) {
+        let ids = this.state.videoIds;
+        for (let i in data.items) {
+          let id = data.items[i].id;
+          if (!ids.includes(id)) {
+            let matchLength = data.items[i].matches.length;
+            cycleMax += matchLength ? matchLength : 1;
+            videoList[numVideos++] = data.items[i];
+            ids.push(id);
+          };
         };
-      };
-      this.setState({
-        videoList: videoList,
-        videoIds: ids,
-        pageToken: data.token,
-        cycleMax: cycleMax-1,
-        allowSearches: true,
-        nextColour: "#999",
-        nextDisabled: false
-      });
+        this.setState({
+          videoList: videoList,
+          videoIds: ids,
+          pageToken: data.token,
+          cycleMax: cycleMax-1,
+          allowSearches: true,
+          nextColour: "#999",
+          nextDisabled: false
+        });
+      } else {
+        this.handleModalToggle(true);
+      }
     }
   }
 

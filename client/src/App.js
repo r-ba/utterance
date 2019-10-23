@@ -188,7 +188,7 @@ class App extends React.Component {
     if (parseInt(id) === 0) {
       this.toggleButton("prev", "disable");
       this.toggleButton("next", "enable");
-    } else if (parseInt(id) === Object.keys(this.state.videoList).length-1) {
+    } else if (cycleIndex === this.state.cycleMax) {
       this.toggleButton("prev", "enable");
       this.toggleButton("next", "disable");
     } else {

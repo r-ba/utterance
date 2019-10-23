@@ -18,7 +18,8 @@ class Video extends React.PureComponent {
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     } else {
       if (this.player.id === this.props.item.id) {
-        this.player.seekTo(parseFloat(this.props.item.matches[this.props.time].start));
+        const startSeconds = this.props.item.matches.length ? this.props.item.matches[this.props.time].start : 0;
+        this.player.seekTo(startSeconds);
       } else {
         const startSeconds = this.props.item.matches.length ? this.props.item.matches[this.props.time].start : 0;
         this.player.loadVideoById({
@@ -35,17 +36,15 @@ class Video extends React.PureComponent {
     const startSeconds = this.props.item.matches.length ? this.props.item.matches[this.props.time].start : 0;
     const id = this.props.item.id;
     this.player = new window.YT.Player(`youtube-player-${id}`, {
-      videoId: id,
-      startSeconds: startSeconds,
+      'videoId': id,
       events: {
-        onReady: event => event.target.playVideo()
+        onReady: event => {
+          event.target.playVideo();
+          event.target.seekTo(startSeconds);
+        }
       }
     });
     this.player.id = this.props.item.id;
-  };
-
-  onPlayerReady = event => {
-    event.target.playVideo();
   };
 
   render() {

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Box } from 'grommet';
 import VideoListItem from './VideoListItem';
 
 function VideoList(props) {
@@ -17,12 +16,9 @@ function VideoList(props) {
     );
   });
   return (
-    <Box
-      className="ul-list"
-      direction="column"
-    >
+    <div className="ul-list">
       {videoItems}
-    </Box>
+    </div>
   );
 }
 

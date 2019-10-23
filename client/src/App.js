@@ -219,7 +219,13 @@ class App extends React.Component {
           query={this.state.search}
           phrase={this.state.phrase}
         />
-        <Box direction="row">
+        <Video
+          item={this.state.videoList[this.state.currentVideoId]}
+          time={this.state.currentVideoTime}
+        />
+        <Box
+          direction="row"
+        >
           <Button
             disabled={this.state.prevDisabled}
             onClick={() => this.handleCycle("prev")}
@@ -230,9 +236,11 @@ class App extends React.Component {
               className="video-caret"
             />
           </Button>
-          <Video
-            item={this.state.videoList[this.state.currentVideoId]}
-            time={this.state.currentVideoTime}
+          <VideoList
+            prevVideo={this.state.prevVideoId}
+            currentVideo={this.state.currentVideoId}
+            selectVideo={(id) => this.selectVideo(id)}
+            videos={this.state.videoList}
           />
           <Button
             disabled={this.state.nextDisabled}
@@ -245,12 +253,6 @@ class App extends React.Component {
             />
           </Button>
         </Box>
-        <VideoList
-          prevVideo={this.state.prevVideoId}
-          currentVideo={this.state.currentVideoId}
-          selectVideo={(id) => this.selectVideo(id)}
-          videos={this.state.videoList}
-        />
         {
           this.state.pageToken ?
             <Button

@@ -12,10 +12,10 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      search: "joe rogan",
-      prevSearch: "joe rogan",
-      phrase: "possible",
-      prevPhrase: "possible",
+      search: "magnus carlsen",
+      prevSearch: "magnus carlsen",
+      phrase: "wow",
+      prevPhrase: "wow",
       prevVideoId: 0,
       currentVideoId: 0,
       currentVideoTime: 0,
@@ -26,7 +26,7 @@ class App extends React.Component {
       nextDisabled: false,
       prevColour: "#ddd",
       nextColour: "#999",
-      cycleMax: 26,
+      cycleMax: 32,
       cycleIndex: 0,
       allowSearches: true,
       errModalVisible: false

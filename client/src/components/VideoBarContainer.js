@@ -8,7 +8,7 @@ function VideoBarContainer(props) {
       {
         videoItemsExist ?
           <VideoBar
-            onSelect={props.handleSelect}
+            onSelect={props.onSelect}
             videoItems={props.videoItems}
             playbackIndex={props.playbackIndex}
           />

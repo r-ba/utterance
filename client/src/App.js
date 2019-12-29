@@ -6,7 +6,9 @@ import VideoBarContainer from './components/VideoBarContainer';
 import LoadMoreButton from './components/LoadMoreButton';
 
 import defaultData from './data/defaultData';
-import { fetchData, mergeData, parseData } from './data/transformData';
+import fetchData from './data/fetchData';
+import parseData from './data/parseData';
+import mergeData from './data/mergeData';
 
 class App extends React.Component {
   constructor(props) {

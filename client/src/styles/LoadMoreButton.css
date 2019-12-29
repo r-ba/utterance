@@ -1,0 +1,19 @@
+.load-more {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 10px;
+}
+
+.load-more-button {
+  background-color: #fff;
+  border-radius: 10px;
+  border-width: 1px;
+  border-color: #a88baf;
+  color: #888;
+  font-size: 20px;
+  font-family: "Helvetica Neue", "Arial", sans-serif;
+  font-weight: 300;
+  cursor: pointer;
+  padding: 2.5px 12.5px 2.5px 12.5px;
+}

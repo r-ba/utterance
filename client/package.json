@@ -1,16 +1,11 @@
 {
   "name": "utterance",
   "version": "1.0.0",
-  "private": true,
+  "private": false,
   "dependencies": {
-    "grommet": "^2.7.9",
-    "grommet-icons": "^4.3.0",
     "react": "^16.10.0",
     "react-dom": "^16.10.0",
-    "react-modal": "^3.10.1",
-    "react-scripts": "3.1.2",
-    "react-spinners": "^0.6.1",
-    "styled-components": "^4.4.0"
+    "react-scripts": "3.1.2"
   },
   "scripts": {
     "start": "react-scripts start",
